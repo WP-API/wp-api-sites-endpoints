@@ -697,7 +697,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param WP_Site         $site Site object.
+	 * @param WP_Site $site Site object.
 	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return WP_REST_Response Response object.
@@ -769,6 +769,8 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 
 		if ( empty( $request['path'] ) ) {
 			$prepared_site['path'] = '/';
+		} else {
+			$prepared_site['path'] = $request['path'];
 		}
 
 		$prepared_site['domain'] = $request['domain'];
@@ -1002,7 +1004,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param WP_Site         $site Site object.
+	 * @param WP_Site $site Site object.
 	 * @param WP_REST_Request $request Request data to check.
 	 *
 	 * @return bool Whether the site can be read.
