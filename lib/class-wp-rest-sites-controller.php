@@ -560,10 +560,6 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 				return $prepared_args;
 			}
 
-			if ( isset( $prepared_args['domain'] ) && empty( $prepared_args['domain'] ) ) {
-				return new WP_Error( 'rest_domain_invalid', __( 'Invalid domain.' ), array( 'status' => 400 ) );
-			}
-
 			$result = wp_update_site( $id, wp_slash( (array) $prepared_args ) );
 			if ( is_wp_error( $result ) ) {
 				$result->add_data( array( 'status' => 500 ) );
@@ -773,14 +769,6 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 
 		if ( empty( $request['path'] ) ) {
 			$prepared_site['path'] = '/';
-		}
-
-		/*
-		 * Do not allow a site to be created with missing or empty
-		 * domain
-		 */
-		if ( isset( $request['domain'] ) || empty( $prepared_site['domain'] ) ) {
-			return new WP_Error( 'rest_domain_invalid', __( 'Invalid domain' ), array( 'status' => 400 ) );
 		}
 
 		$prepared_site['domain'] = $request['domain'];
