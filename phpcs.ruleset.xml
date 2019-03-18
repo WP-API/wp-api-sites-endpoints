@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset name="WP-API">
+	<description>Sniffs for the coding standards of the WP-API plugin</description>
+
+    <!-- https://git.io/vHJ52#rulesets -->
+    <rule ref="WordPress-Core" />
+
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <rule ref="WordPress.Files.FileName.InvalidClassFileName">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+</ruleset>
