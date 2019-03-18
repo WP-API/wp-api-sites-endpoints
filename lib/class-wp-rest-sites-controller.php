@@ -764,6 +764,9 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 
 		$prepared_site['network'] = get_current_network_id();
 		if ( isset( $request['network'] ) ) {
+			if ( ! get_network( $request['network'] ) ) {
+				return new WP_Error( 'rest_network_id_invalid', __( 'Invalid network ID.' ), array( 'status' => 400 ) );
+			}
 			$prepared_site['network_id'] = (int) $request['network'];
 		}
 
