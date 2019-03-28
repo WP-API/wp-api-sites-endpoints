@@ -1140,7 +1140,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	 *
 	 * @return array
 	 */
-	protected function get_user_site_ids( $user_id ) {
+	public function get_user_site_ids( $user_id ) {
 		global $wpdb;
 		$site_ids = array();
 		$user_id  = (int) $user_id;
