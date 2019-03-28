@@ -169,10 +169,11 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 		foreach ( $blog_ids as $blog_id ) {
 			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
 		}
+		array_unshift( $blog_ids, 1 );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/sites' );
 		$request->set_param( 'user', $user_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 401, $response->get_status() );
+		$this->assertEquals( 400, $response->get_status() );
 	}
 
 	/**
