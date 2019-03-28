@@ -178,7 +178,7 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 	/**
 	 *
 	 */
-	public function test_get_items_filter_user() {
+	public function test_get_items_filter_with_includes_user() {
 		wp_set_current_user( self::$superadmin_id );
 		$blog_ids = self::factory()->blog->create_many( 5 );
 		$user_id  = self::factory()->user->create();
