@@ -2,9 +2,9 @@
 /**
  * REST API: WP_REST_Sites_Controller class
  *
- * @package WordPress
+ * @package    WordPress
  * @subpackage REST_API
- * @since x.x.x
+ * @since      x.x.x
  */
 
 /**
@@ -12,7 +12,7 @@
  *
  * @since x.x.x
  *
- * @see WP_REST_Controller
+ * @see   WP_REST_Controller
  */
 class WP_REST_Sites_Controller extends WP_REST_Controller {
 
@@ -112,11 +112,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to read sites.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|bool True if the request has read access, error object otherwise.
+	 * @since x.x.x
+	 *
 	 */
 	public function get_items_permissions_check( $request ) {
 
@@ -142,11 +142,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves a list of site items.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or error object on failure.
+	 * @since x.x.x
+	 *
 	 */
 	public function get_items( $request ) {
 
@@ -247,16 +247,16 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 			$prepared_args['site__in'] = $site_ids;
 		}
 
-
 		/**
 		 * Filters arguments, before passing to WP_Site_Query, when querying sites via the REST API.
 		 *
+		 * @param array           $prepared_args Array of arguments for WP_Site_Query.
+		 * @param WP_REST_Request $request       The current request.
+		 *
 		 * @since x.x.x
 		 *
-		 * @link https://developer.wordpress.org/reference/classes/wp_site_query/
+		 * @link  https://developer.wordpress.org/reference/classes/wp_site_query/
 		 *
-		 * @param array $prepared_args Array of arguments for WP_Site_Query.
-		 * @param WP_REST_Request $request The current request.
 		 */
 		$prepared_args = apply_filters( 'rest_site_query', $prepared_args, $request );
 
@@ -318,11 +318,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Get the site, if the ID is valid.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param int $id Supplied ID.
 	 *
 	 * @return WP_Site|WP_Error Site object if ID is valid, WP_Error otherwise.
+	 * @since x.x.x
+	 *
 	 */
 	protected function get_site( $id ) {
 		if ( ! is_multisite() ) {
@@ -346,11 +346,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to read the site.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|bool True if the request has read access for the item, error object otherwise.
+	 * @since x.x.x
+	 *
 	 */
 	public function get_item_permissions_check( $request ) {
 		$site = $this->get_site( $request['id'] );
@@ -376,11 +376,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves a site.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or error object on failure.
+	 * @since x.x.x
+	 *
 	 */
 	public function get_item( $request ) {
 		$site = $this->get_site( $request['id'] );
@@ -397,11 +397,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to create a site.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|bool True if the request has access to create items, error object otherwise.
+	 * @since x.x.x
+	 *
 	 */
 	public function create_item_permissions_check( $request ) {
 		if ( 0 === get_current_user_id() ) {
@@ -418,11 +418,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Creates a site.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or error object on failure.
+	 * @since x.x.x
+	 *
 	 */
 	public function create_item( $request ) {
 
@@ -442,10 +442,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		 * Returning a WP_Error value from the filter will shortcircuit insertion and allow
 		 * skipping further processing.
 		 *
+		 * @param array|WP_Error  $prepared_site The prepared site data for wp_insert_site().
+		 * @param WP_REST_Request $request       Request used to insert the site.
+		 *
 		 * @since x.x.x
 		 *
-		 * @param array|WP_Error $prepared_site The prepared site data for wp_insert_site().
-		 * @param WP_REST_Request $request Request used to insert the site.
 		 */
 		$prepared_site = apply_filters( 'rest_pre_insert_site', $prepared_site, $request );
 		if ( is_wp_error( $prepared_site ) ) {
@@ -469,12 +470,13 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		/**
 		 * Fires after a site is created or updated via the REST API.
 		 *
+		 * @param WP_Site         $site     Inserted or updated site object.
+		 * @param WP_REST_Request $request  Request object.
+		 * @param bool            $creating True when creating a site, false
+		 *                                  when updating.
+		 *
 		 * @since x.x.x
 		 *
-		 * @param WP_Site $site Inserted or updated site object.
-		 * @param WP_REST_Request $request Request object.
-		 * @param bool $creating True when creating a site, false
-		 *                                  when updating.
 		 */
 		do_action( 'rest_insert_site', $site, $request, true );
 
@@ -510,11 +512,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if a given REST request has access to update a site.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|bool True if the request has access to update the item, error object otherwise.
+	 * @since x.x.x
+	 *
 	 */
 	public function update_item_permissions_check( $request ) {
 		$site = $this->get_site( $request['id'] );
@@ -540,11 +542,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Updates a site.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or error object on failure.
+	 * @since x.x.x
+	 *
 	 */
 	public function update_item( $request ) {
 		$site = $this->get_site( $request['id'] );
@@ -629,11 +631,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to delete a site.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|bool True if the request has access to delete the item, error object otherwise.
+	 * @since x.x.x
+	 *
 	 */
 	public function delete_item_permissions_check( $request ) {
 		$site = $this->get_site( $request['id'] );
@@ -659,11 +661,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Deletes a site.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or error object on failure.
+	 * @since x.x.x
+	 *
 	 */
 	public function delete_item( $request ) {
 		$site = $this->get_site( $request['id'] );
@@ -701,11 +703,12 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		/**
 		 * Fires after a site is deleted via the REST API.
 		 *
+		 * @param WP_Site          $site     The deleted site data.
+		 * @param WP_REST_Response $response The response returned from the API.
+		 * @param WP_REST_Request  $request  The request sent to the API.
+		 *
 		 * @since x.x.x
 		 *
-		 * @param WP_Site $site The deleted site data.
-		 * @param WP_REST_Response $response The response returned from the API.
-		 * @param WP_REST_Request $request The request sent to the API.
 		 */
 		do_action( 'rest_delete_site', $site, $response, $request );
 
@@ -715,12 +718,12 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares a single site output for response.
 	 *
-	 * @since x.x.x
-	 *
-	 * @param WP_Site $site Site object.
+	 * @param WP_Site         $site    Site object.
 	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return WP_REST_Response Response object.
+	 * @since x.x.x
+	 *
 	 */
 	public function prepare_item_for_response( $site, $request ) {
 		$data = array(
@@ -756,11 +759,12 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		 *
 		 * Allows modification of the site right before it is returned.
 		 *
+		 * @param WP_REST_Response $response The response object.
+		 * @param WP_Site          $site     The original site object.
+		 * @param WP_REST_Request  $request  Request used to generate the response.
+		 *
 		 * @since x.x.x
 		 *
-		 * @param WP_REST_Response $response The response object.
-		 * @param WP_Site $site The original site object.
-		 * @param WP_REST_Request $request Request used to generate the response.
 		 */
 		return apply_filters( 'rest_prepare_site', $response, $site, $request );
 	}
@@ -768,11 +772,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares a single site to be inserted into the database.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Request object.
 	 *
 	 * @return array|WP_Error Prepared site, otherwise WP_Error object.
+	 * @since x.x.x
+	 *
 	 */
 	protected function prepare_item_for_database( $request ) {
 		$prepared_site = array();
@@ -803,10 +807,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		 *
 		 * Allows modification of the site right after it is prepared for the database.
 		 *
+		 * @param array           $prepared_site The prepared site data for `wp_insert_site`.
+		 * @param WP_REST_Request $request       The current request.
+		 *
 		 * @since x.x.x
 		 *
-		 * @param array $prepared_site The prepared site data for `wp_insert_site`.
-		 * @param WP_REST_Request $request The current request.
 		 */
 		return apply_filters( 'rest_preprocess_site', $prepared_site, $request );
 	}
@@ -814,9 +819,9 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves the site's schema, conforming to JSON Schema.
 	 *
+	 * @return array
 	 * @since x.x.x
 	 *
-	 * @return array
 	 */
 	public function get_item_schema() {
 		$schema = array(
@@ -899,9 +904,9 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves the query params for collections.
 	 *
+	 * @return array Sites collection parameters.
 	 * @since x.x.x
 	 *
-	 * @return array Sites collection parameters.
 	 */
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
@@ -1023,9 +1028,10 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		 * collection parameter to an internal WP_Site_Query parameter. Use the
 		 * `rest_site_query` filter to set WP_Site_Query parameters.
 		 *
+		 * @param array $query_params JSON Schema-formatted collection parameters.
+		 *
 		 * @since x.x.x
 		 *
-		 * @param array $query_params JSON Schema-formatted collection parameters.
 		 */
 		return apply_filters( 'rest_site_collection_params', $query_params );
 	}
@@ -1033,12 +1039,12 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if the site can be read.
 	 *
-	 * @since x.x.x
-	 *
-	 * @param WP_Site $site Site object.
+	 * @param WP_Site         $site    Site object.
 	 * @param WP_REST_Request $request Request data to check.
 	 *
 	 * @return bool Whether the site can be read.
+	 * @since x.x.x
+	 *
 	 */
 	protected function check_read_permission( $site, $request ) {
 		if ( 0 === get_current_user_id() ) {
@@ -1060,11 +1066,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if a site can be edited or deleted.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param object $site Site object.
 	 *
 	 * @return bool Whether the site can be edited or deleted.
+	 * @since x.x.x
+	 *
 	 */
 	protected function check_edit_permission( $site ) {
 		if ( 0 === (int) get_current_user_id() ) {
@@ -1081,11 +1087,11 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	/**
 	 * Checks current user's read permissions.
 	 *
-	 * @since x.x.x
-	 *
 	 * @param WP_REST_Request $request Request data to check.
 	 *
 	 * @return bool Whether the site can be read.
+	 * @since x.x.x
+	 *
 	 */
 	protected function check_my_read_permission( $request ) {
 		$user_id = (int) get_current_user_id();
