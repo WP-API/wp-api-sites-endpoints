@@ -128,12 +128,13 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_multisite_not_installed', __( 'Multisite is not installed' ), array( 'status' => 400 ) );
 		}
 
-		if ( $this->check_my_read_permission( $request ) ) {
-			return true;
-		}
 
 		if ( ! current_user_can( 'manage_sites' ) ) {
-			return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit sites.' ), array( 'status' => rest_authorization_required_code() ) );
+			if ( $this->check_my_read_permission( $request ) ) {
+				return true;
+			} else {
+				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit sites.' ), array( 'status' => rest_authorization_required_code() ) );
+			}
 		}
 
 		return true;
@@ -1056,11 +1057,15 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		}
 
 
-		if ( $this->check_my_read_permission( $request ) ) {
-			return true;
+		if ( ! current_user_can( 'manage_sites' ) ) {
+			if ( $this->check_my_read_permission( $request ) ) {
+				return true;
+			} else {
+				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit sites.' ), array( 'status' => rest_authorization_required_code() ) );
+			}
 		}
 
-		return current_user_can( 'manage_sites' );
+		return true;
 	}
 
 	/**

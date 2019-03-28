@@ -118,7 +118,7 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( false ) );
 		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( 0 ) );
 		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( '' ) );
-		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( - 1 ) );
+		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( REST_TESTS_IMPOSSIBLY_HIGH_NUMBER ) );
 		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( 999 ) );
 	}
 
@@ -129,7 +129,7 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 
 		$blog_ids = self::factory()->blog->create_many( 5 );
 		$user_id  = self::factory()->user->create();
-
+		array_unshift( $blog_ids, 1 );
 		foreach ( $blog_ids as $blog_id ) {
 			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
 		}
