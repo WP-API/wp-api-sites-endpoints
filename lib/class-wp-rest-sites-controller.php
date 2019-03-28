@@ -1108,6 +1108,9 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	 * @return bool|WP_Error
 	 */
 	public function is_valid_user( $user ) {
+		if ( empty( $user ) ) {
+			return true;
+		}
 		if ( 'me' === $user ) {
 			return true;
 		}
