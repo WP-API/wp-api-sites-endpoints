@@ -739,6 +739,10 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 			'spam'         => (int) $site->spam,
 			'deleted'      => (int) $site->deleted,
 			'lang_id'      => (int) $site->lang_id,
+			'blogname'     => $site->blogname,
+			'siteurl'	   => $site->siteurl,
+			'home'	       => $site->home,
+			'post_count'   => (int) $site->post_count,
 		);
 
 		$schema = $this->get_item_schema();
@@ -892,7 +896,26 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 					'description' => '',
 					'type'        => 'integer',
 				),
-
+				'blogname'     => array(
+					'description' => '',
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'siteurl'       => array(
+					'description' => '',
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'home'         => array(
+					'description' => '',
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'post_count'   => array(
+					'description' => '',
+					'type'        => 'integer',
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
 			),
 		);
 
