@@ -59,7 +59,7 @@ class WP_Test_REST_Sites_Controller extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		self::$network_id = $factory->site->create();
+		self::$network_id = $factory->network->create();
 
 		self::$approved_id = $factory->blog->create(
 			array(
