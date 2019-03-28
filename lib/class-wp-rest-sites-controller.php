@@ -904,7 +904,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 					'description' => __( 'Number of posts on this site' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit' ),
-					'default'     => 0
+					'default'     => 0,
 				),
 			),
 		);
