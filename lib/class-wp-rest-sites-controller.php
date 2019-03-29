@@ -129,11 +129,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		}
 
 		if ( ! current_user_can( 'manage_sites' ) ) {
-			if ( $this->check_my_read_permission( $request ) ) {
-				return true;
-			} else {
-				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit sites.' ), array( 'status' => rest_authorization_required_code() ) );
-			}
+			return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit sites.' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 
 		return true;
@@ -230,21 +226,6 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 
 		if ( isset( $registered['page'] ) && empty( $request['offset'] ) ) {
 			$prepared_args['offset'] = $prepared_args['number'] * ( absint( $request['page'] ) - 1 );
-		}
-
-		// Filter results by user.
-		if ( ! empty( $request['user'] ) ) {
-			$site_ids = $this->get_user_site_ids( $request['user'] );
-			// If site__in already set, only allow users to look at there own sites.
-			if ( ! empty( $prepared_args['site__in'] ) ) {
-				$site_ids = array_intersect( $prepared_args['site__in'], $site_ids );
-			}
-
-			if ( empty( $site_ids ) ) {
-				return new WP_Error( 'no_sites_found', __( 'No sites found for user' ), array( 'status' => 404 ) );
-			}
-
-			$prepared_args['site__in'] = $site_ids;
 		}
 
 		/**
@@ -740,8 +721,8 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 			'deleted'      => (int) $site->deleted,
 			'lang_id'      => (int) $site->lang_id,
 			'blogname'     => $site->blogname,
-			'siteurl'	   => $site->siteurl,
-			'home'	       => $site->home,
+			'siteurl'      => $site->siteurl,
+			'home'         => $site->home,
 			'post_count'   => (int) $site->post_count,
 		);
 
@@ -840,81 +821,90 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'network'      => array(
-					'description' => '',
+					'description' => __( 'The site\'s network ID. Default is the current network ID.' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'domain'       => array(
-					'description' => '',
+					'description' => __( ' Site domain,' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit', 'embed' ),
+					'default'     => '',
 				),
 				'path'         => array(
-					'description' => '',
+					'description' => __( 'Site path.' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit', 'embed' ),
+					'default'     => '/',
 				),
 				'registered'   => array(
-					'description' => '',
+					'description' => __( 'When the site was registered, in SQL datetime format. Default is the current time.' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'last_updated' => array(
-					'description' => '',
+					'description' => __( 'When the site was last updated, in SQL datetime format. Default isthe value of $registered.' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'public'       => array(
 					'context'     => array( 'view', 'edit', 'embed' ),
-					'description' => '',
+					'description' => __( 'Whether the site is public. Default 1.' ),
 					'type'        => 'integer',
+					'default'     => 1,
 				),
 				'archived'     => array(
 					'context'     => array( 'view', 'edit', 'embed' ),
-					'description' => '',
+					'description' => __( 'Whether the site is archived. Default 0.' ),
 					'type'        => 'integer',
+					'default'     => 0,
 				),
 				'mature'       => array(
 					'context'     => array( 'view', 'edit', 'embed' ),
-					'description' => '',
+					'description' => __( 'Whether the site is mature. Default 0.' ),
 					'type'        => 'integer',
+					'default'     => 0,
 				),
 				'spam'         => array(
 					'context'     => array( 'view', 'edit', 'embed' ),
-					'description' => '',
+					'description' => __( ' Whether the site is spam. Default 0.' ),
 					'type'        => 'integer',
+					'default'     => 0,
 				),
 				'deleted'      => array(
 					'context'     => array( 'view', 'edit', 'embed' ),
-					'description' => '',
+					'description' => __( 'Whether the site is deleted. Default 0.' ),
 					'type'        => 'integer',
+					'default'     => 0,
 				),
 				'lang_id'      => array(
 					'context'     => array( 'view', 'edit', 'embed' ),
-					'description' => '',
+					'description' => __( 'The site\'s language ID. Currently unused. Default 0.' ),
 					'type'        => 'integer',
+					'default'     => 0,
 				),
 				'blogname'     => array(
-					'description' => '',
+					'description' => __( 'Site\'s name, stored in blogname option' ),
 					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
+					'context'     => array( 'view', 'edit' ),
 				),
-				'siteurl'       => array(
-					'description' => '',
+				'siteurl'      => array(
+					'description' => __( 'Site\'s site url, stored in site_url option' ),
 					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
+					'context'     => array( 'view', 'edit' ),
 				),
 				'home'         => array(
-					'description' => '',
+					'description' => __( 'Site\'s home url, stored in hom option' ),
 					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
+					'context'     => array( 'view', 'edit' ),
 				),
 				'post_count'   => array(
-					'description' => '',
+					'description' => __( 'Number of posts on this site' ),
 					'type'        => 'integer',
-					'context'     => array( 'view', 'edit', 'embed' ),
+					'context'     => array( 'view', 'edit' ),
+					'default'     => 0,
 				),
 			),
 		);
@@ -986,14 +976,6 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 			'default'     => array(),
 		);
 
-		$query_params['user'] = array(
-			'description'       => __( 'Limit result set to users site.' ),
-			'type'              => 'string',
-			'default'           => '',
-			'required'          => false,
-			'validate_callback' => array( $this, 'is_valid_user' ),
-		);
-
 		$query_params['offset'] = array(
 			'description' => __( 'Offset the result set by a specific number of items.' ),
 			'type'        => 'integer',
@@ -1002,7 +984,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		$query_params['order'] = array(
 			'description' => __( 'Order sort attribute ascending or descending.' ),
 			'type'        => 'string',
-			'default'     => 'asc',
+			'default'     => 'desc',
 			'enum'        => array(
 				'asc',
 				'desc',
@@ -1065,11 +1047,12 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	 * @param WP_Site         $site    Site object.
 	 * @param WP_REST_Request $request Request data to check.
 	 *
-	 * @return bool|WP_Error Whether the site can be read.
+	 * @return bool Whether the site can be read.
 	 * @since x.x.x
 	 *
 	 */
 	protected function check_read_permission( $site, $request ) {
+
 		if ( 0 === get_current_user_id() ) {
 			return false;
 		}
@@ -1078,15 +1061,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_multisite_not_installed', __( 'Multisite is not installed' ), array( 'status' => 400 ) );
 		}
 
-		if ( ! current_user_can( 'manage_sites' ) ) {
-			if ( $this->check_my_read_permission( $request ) ) {
-				return true;
-			} else {
-				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit sites.' ), array( 'status' => rest_authorization_required_code() ) );
-			}
-		}
-
-		return true;
+		return current_user_can( 'manage_sites' );
 	}
 
 	/**
@@ -1094,7 +1069,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	 *
 	 * @param object $site Site object.
 	 *
-	 * @return bool|WP_Error Whether the site can be edited or deleted.
+	 * @return bool Whether the site can be edited or deleted.
 	 * @since x.x.x
 	 *
 	 */
@@ -1110,98 +1085,4 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		return current_user_can( 'manage_sites' );
 	}
 
-	/**
-	 * Checks current user's read permissions.
-	 *
-	 * @param WP_REST_Request $request Request data to check.
-	 *
-	 * @return bool Whether the site can be read.
-	 * @since x.x.x
-	 *
-	 */
-	protected function check_my_read_permission( $request ) {
-		$user_id = (int) get_current_user_id();
-		if ( 0 === $user_id ) {
-			return false;
-		}
-
-		if ( 'me' === $request->get_param( 'user' ) ) {
-			$request->set_param( 'user', $user_id );
-		}
-
-		return ( $request->get_param( 'user' ) === $user_id );
-	}
-
-	/**
-	 * Validate if user provided is in the valid format. Either me (special case) or a user id for an existing user.
-	 *
-	 * @param $user
-	 *
-	 * @return bool|WP_Error
-	 */
-	public function is_valid_user( $user ) {
-		if ( empty( $user ) ) {
-			return true;
-		}
-		if ( 'me' === $user ) {
-			return true;
-		}
-		if ( ! is_numeric( $user ) ) {
-			return new WP_Error( 'invalid_user_id', __( 'Invalid user ID' ), array( 'status' => 404 ) );
-		}
-
-		$user = get_user_by( 'id', $user );
-		if ( ! $user ) {
-			return new WP_Error( 'user_doesnt_exist', __( 'User does not exist' ), array( 'status' => 404 ) );
-		}
-
-		return true;
-	}
-
-
-	/**
-	 * Helper function to get all site ids based on a user's id.
-	 *
-	 * @param $user_id
-	 *
-	 * @return array
-	 */
-	public function get_user_site_ids( $user_id ) {
-		global $wpdb;
-		$site_ids = array();
-		$user_id  = (int) $user_id;
-		if ( empty( $user_id ) ) {
-			return $site_ids;
-		}
-		// Logged out users can't have sites
-		$keys = get_user_meta( $user_id );
-		if ( empty( $keys ) ) {
-			return $site_ids;
-		}
-		if ( ! is_multisite() ) {
-			$site_ids[] = get_current_blog_id();
-
-			return $site_ids;
-		}
-		if ( isset( $keys[ $wpdb->base_prefix . 'capabilities' ] ) && defined( 'MULTISITE' ) ) {
-			$site_ids[] = 1;
-			unset( $keys[ $wpdb->base_prefix . 'capabilities' ] );
-		}
-		$keys = array_keys( $keys );
-		foreach ( $keys as $key ) {
-			if ( 'capabilities' !== substr( $key, - 12 ) ) {
-				continue;
-			}
-			if ( $wpdb->base_prefix && 0 !== strpos( $key, $wpdb->base_prefix ) ) {
-				continue;
-			}
-			$site_id = str_replace( array( $wpdb->base_prefix, '_capabilities' ), '', $key );
-			if ( ! is_numeric( $site_id ) ) {
-				continue;
-			}
-			$site_ids[] = (int) $site_id;
-		}
-
-		return $site_ids;
-	}
 }
