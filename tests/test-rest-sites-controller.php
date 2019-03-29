@@ -163,7 +163,7 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 
 		$blog_ids = self::factory()->blog->create_many( 5 );
 		$user_id  = self::factory()->user->create();
-		wp_set_current_user( self::$user_id );
+		wp_set_current_user( $user_id );
 		foreach ( $blog_ids as $blog_id ) {
 			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
 		}
