@@ -2,9 +2,9 @@
 /**
  * REST API: WP_REST_Site_Meta_Fields class
  *
- * @package WordPress
+ * @package    WordPress
  * @subpackage REST_API
- * @since x.x.x
+ * @since      x.x.x
  */
 
 /**
@@ -12,16 +12,16 @@
  *
  * @since x.x.x
  *
- * @see WP_REST_Meta_Fields
+ * @see   WP_REST_Meta_Fields
  */
 class WP_REST_Site_Meta_Fields extends WP_REST_Meta_Fields {
 
 	/**
 	 * Retrieves the object type for site meta.
 	 *
+	 * @return string The meta type.
 	 * @since x.x.x
 	 *
-	 * @return string The meta type.
 	 */
 	protected function get_meta_type() {
 		return 'site';
@@ -30,20 +30,20 @@ class WP_REST_Site_Meta_Fields extends WP_REST_Meta_Fields {
 	/**
 	 * Retrieves the object meta subtype.
 	 *
+	 * @return string 'site' There are no subtypes.
 	 * @since x.x.x
 	 *
-	 * @return string 'site' There are no subtypes.
 	 */
 	protected function get_meta_subtype() {
-		return 'site';
+		return '';
 	}
 
 	/**
 	 * Retrieves the type for register_rest_field() in the context of sites.
 	 *
+	 * @return string The REST field type.
 	 * @since x.x.x
 	 *
-	 * @return string The REST field type.
 	 */
 	public function get_rest_field_type() {
 		return 'site';
