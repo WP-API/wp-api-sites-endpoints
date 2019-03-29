@@ -3,7 +3,7 @@
  * PHPUnit bootstrap file
  *
  */
-
+define( 'WP_TESTS_MULTISITE', true );
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 
 if ( ! $_tests_dir ) {

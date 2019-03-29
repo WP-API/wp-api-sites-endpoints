@@ -148,12 +148,14 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 		foreach ( $blog_ids as $blog_id ) {
 			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
 		}
+		array_unshift( $blog_ids, 1 );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/sites' );
 		$request->set_param( 'user', (string) $user_id );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$sites = $response->get_data();
 		$this->assertCount( 6, $sites );
+		$this->assertEquals( $blog_ids, wp_list_pluck( $sites, 'id' ) );
 	}
 
 	/**
@@ -167,12 +169,14 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 		foreach ( $blog_ids as $blog_id ) {
 			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
 		}
+		array_unshift( $blog_ids, 1 );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/sites' );
 		$request->set_param( 'user', 'me' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$sites = $response->get_data();
 		$this->assertCount( 6, $sites );
+		$this->assertEquals( $blog_ids, wp_list_pluck( $sites, 'id' ) );
 	}
 
 	/**
@@ -213,6 +217,7 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 		//$this->assertEquals( 200, $response->get_status() );
 		$sites = $response->get_data();
 		$this->assertCount( 1, $sites );
+		$this->assertEquals( array( $blog_ids[0] ), wp_list_pluck( $sites, 'id' ) );
 	}
 
 }
