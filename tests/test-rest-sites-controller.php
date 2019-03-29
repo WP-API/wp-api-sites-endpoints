@@ -111,4 +111,113 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 	public function test_get_item_schema() {
 	}
 
+	/**
+	 *
+	 */
+	public function test_invalid_user_input() {
+		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( false ) );
+		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( 0 ) );
+		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( '' ) );
+		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( REST_TESTS_IMPOSSIBLY_HIGH_NUMBER ) );
+		$this->assertEquals( array(), $this->endpoint->get_user_site_ids( 999 ) );
+	}
+
+	/**
+	 *
+	 */
+	public function test_valid_user_input() {
+
+		$blog_ids = self::factory()->blog->create_many( 5 );
+		$user_id  = self::factory()->user->create();
+		array_unshift( $blog_ids, 1 );
+		foreach ( $blog_ids as $blog_id ) {
+			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
+		}
+
+		$this->assertEquals( $blog_ids, $this->endpoint->get_user_site_ids( $user_id ) );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_filter_user() {
+		wp_set_current_user( self::$superadmin_id );
+		$blog_ids = self::factory()->blog->create_many( 5 );
+		$user_id  = self::factory()->user->create();
+
+		foreach ( $blog_ids as $blog_id ) {
+			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
+		}
+		array_unshift( $blog_ids, 1 );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/sites' );
+		$request->set_param( 'user', (string) $user_id );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$sites = $response->get_data();
+		$this->assertCount( 6, $sites );
+		$this->assertEquals( $blog_ids, wp_list_pluck( $sites, 'id' ) );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_me_filter_user() {
+
+		$blog_ids = self::factory()->blog->create_many( 5 );
+		$user_id  = self::factory()->user->create();
+		wp_set_current_user( $user_id );
+		foreach ( $blog_ids as $blog_id ) {
+			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
+		}
+		array_unshift( $blog_ids, 1 );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/sites' );
+		$request->set_param( 'user', 'me' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$sites = $response->get_data();
+		$this->assertCount( 6, $sites );
+		$this->assertEquals( $blog_ids, wp_list_pluck( $sites, 'id' ) );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_filter_user_no_access() {
+
+		$blog_ids = self::factory()->blog->create_many( 5 );
+		$user_id  = self::factory()->user->create();
+		$user_id2 = self::factory()->user->create();
+		wp_set_current_user( $user_id2 );
+
+		foreach ( $blog_ids as $blog_id ) {
+			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
+		}
+		array_unshift( $blog_ids, 1 );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/sites' );
+		$request->set_param( 'user', (string) $user_id );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 403, $response->get_status() );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_filter_with_includes_user() {
+		wp_set_current_user( self::$superadmin_id );
+		$blog_ids = self::factory()->blog->create_many( 5 );
+		$user_id  = self::factory()->user->create();
+
+		foreach ( $blog_ids as $blog_id ) {
+			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
+		}
+		$request = new WP_REST_Request( 'GET', '/wp/v2/sites' );
+		$request->set_param( 'user', (string) $user_id );
+		$request->set_param( 'include', $blog_ids[0] );
+		$response = rest_get_server()->dispatch( $request );
+		//$this->assertEquals( 200, $response->get_status() );
+		$sites = $response->get_data();
+		$this->assertCount( 1, $sites );
+		$this->assertEquals( array( $blog_ids[0] ), wp_list_pluck( $sites, 'id' ) );
+	}
+
 }
