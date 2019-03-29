@@ -159,6 +159,25 @@ class WP_Test_REST_Site_Controller extends WP_Test_REST_Controller_TestCase {
 	/**
 	 *
 	 */
+	public function test_get_items_me_filter_user() {
+
+		$blog_ids = self::factory()->blog->create_many( 5 );
+		$user_id  = self::factory()->user->create();
+		wp_set_current_user( self::$user_id );
+		foreach ( $blog_ids as $blog_id ) {
+			add_user_to_blog( $blog_id, $user_id, 'subscriber' );
+		}
+		$request = new WP_REST_Request( 'GET', '/wp/v2/sites' );
+		$request->set_param( 'user', 'me' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$sites = $response->get_data();
+		$this->assertCount( 6, $sites );
+	}
+
+	/**
+	 *
+	 */
 	public function test_get_items_filter_user_no_access() {
 
 		$blog_ids = self::factory()->blog->create_many( 5 );
