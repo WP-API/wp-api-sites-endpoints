@@ -1,63 +1,106 @@
 <?php
 /**
- * Bootstrap the plugin unit testing environment.
+ * Unit Tests bootstrap file.
  *
- * @package WordPress
- * @subpackage JSON API
+ * @package JWTAuth
+ * @since 0.1
  */
+define( 'WP_TESTS_MULTISITE', true );
+/**
+ * Determine if we should update the content and plugin paths.
+ */
+if ( ! defined( 'WP_CONTENT_DIR' ) && getenv( 'WP_CONTENT_DIR' ) ) {
+	define( 'WP_CONTENT_DIR', getenv( 'WP_CONTENT_DIR' ) );
+}
+
+if ( ! defined( 'WP_CONTENT_DIR' ) ) {
+	if ( file_exists( dirname( __DIR__ ) . '/wp-load.php' ) ) {
+		define( 'WP_CONTENT_DIR', dirname( __DIR__ ) . '/wp-content' );
+	} elseif ( file_exists( '../../../wp-content' ) ) {
+		define( 'WP_CONTENT_DIR', dirname( dirname( dirname( getcwd() ) ) ) . '/wp-content' );
+	}
+}
+
+if ( defined( 'WP_CONTENT_DIR' ) && ! defined( 'WP_PLUGIN_DIR' ) ) {
+	define( 'WP_PLUGIN_DIR', rtrim( WP_CONTENT_DIR, '/' ) . '/plugins' );
+}
+
+if ( file_exists( __DIR__ . '/../phpunit-plugin-bootstrap.project.php' ) ) {
+	require_once __DIR__ . '/../phpunit-plugin-bootstrap.project.php';
+}
+
+global $_plugin_file;
+
+$_tests_dir = getenv( 'WP_TESTS_DIR' );
+
+// Travis CI & Vagrant SSH tests directory.
+if ( empty( $_tests_dir ) ) {
+	$_tests_dir = '/tmp/wordpress-tests';
+}
+
+// Relative path to Core tests directory.
+if ( ! is_dir( $_tests_dir . '/includes/' ) ) {
+	$_tests_dir = '../../../../tests/phpunit';
+}
+
+if ( ! is_dir( $_tests_dir . '/includes/' ) ) {
+	// phpcs:disable
+	trigger_error( 'Unable to locate wordpress-tests-lib', E_USER_ERROR );
+	// phpcs:enable
+}
+require_once $_tests_dir . '/includes/functions.php';
+
+$_plugin_dir = getcwd();
+foreach ( glob( $_plugin_dir . '/*.php' ) as $_plugin_file_candidate ) {
+	// @codingStandardsIgnoreStart
+	$_plugin_file_src = file_get_contents( $_plugin_file_candidate );
+	// @codingStandardsIgnoreEnd
+	if ( preg_match( '/Plugin\s*Name\s*:/', $_plugin_file_src ) ) {
+		$_plugin_file = $_plugin_file_candidate;
+		break;
+	}
+}
+if ( ! isset( $_plugin_file ) ) {
+	// phpcs:disable
+	trigger_error( 'Unable to locate a file containing a plugin metadata block.', E_USER_ERROR );
+	// phpcs:enable
+}
+unset( $_plugin_dir, $_plugin_file_candidate, $_plugin_file_src );
 
 /**
- * Determine where the WP test suite lives.
+ * Force plugins defined in a constant (supplied by phpunit.xml.dist) to be active at runtime.
  *
- * Support for:
- * 1. `WP_DEVELOP_DIR` environment variable, which points to a checkout
- *   of the develop.svn.wordpress.org repository (this is recommended)
- * 2. `WP_TESTS_DIR` environment variable, which points to a checkout
- * 3. `WP_ROOT_DIR` environment variable, which points to a checkout
- * 4. Plugin installed inside of WordPress.org developer checkout
- * 5. Tests checked out to /tmp
+ * @filter site_option_active_sitewide_plugins
+ * @filter option_active_plugins
+ *
+ * @param array $active_plugins All active plugins.
+ * @return array
  */
-if ( false !== getenv( 'WP_DEVELOP_DIR' ) ) {
-	$test_root = getenv( 'WP_DEVELOP_DIR' ) . '/tests/phpunit';
-} elseif ( false !== getenv( 'WP_TESTS_DIR' ) ) {
-	$test_root = getenv( 'WP_TESTS_DIR' );
-} elseif ( false !== getenv( 'WP_ROOT_DIR' ) ) {
-	$test_root = getenv( 'WP_ROOT_DIR' ) . '/tests/phpunit';
-} elseif ( file_exists( dirname( __FILE__ ) . '/../../../../tests/phpunit/includes/bootstrap.php' ) ) {
-	$test_root = dirname( __FILE__ ) . '/../../../../tests/phpunit';
-} elseif ( file_exists( '/tmp/wordpress-tests-lib/includes/bootstrap.php' ) ) {
-	$test_root = '/tmp/wordpress-tests-lib';
+function _phpunit_filter_active_plugins( $active_plugins ) {
+	$forced_active_plugins = array();
+	if ( defined( 'WP_TEST_ACTIVATED_PLUGINS' ) ) {
+		$forced_active_plugins = preg_split( '/\s*,\s*/', WP_TEST_ACTIVATED_PLUGINS );
+	}
+	if ( ! empty( $forced_active_plugins ) ) {
+		foreach ( $forced_active_plugins as $forced_active_plugin ) {
+			$active_plugins[] = $forced_active_plugin;
+		}
+	}
+	return $active_plugins;
 }
+tests_add_filter( 'site_option_active_sitewide_plugins', '_phpunit_filter_active_plugins' );
+tests_add_filter( 'option_active_plugins', '_phpunit_filter_active_plugins' );
 
-if ( file_exists( dirname( dirname( __FILE__ ) ) . '/wp-api/plugin.php' ) ) {
-	define( 'WP_API_ROOT', dirname( dirname( __FILE__ ) ) . '/wp-api' );
-} elseif ( dirname( dirname( dirname( __FILE__ ) ) ) . '/wp-api/plugin.php' ) {
-	define( 'WP_API_ROOT', dirname( dirname( dirname( __FILE__ ) ) ) . '/wp-api' );
+/**
+ * Load the plugin.
+ */
+function _phpunit_load_plugin_file() {
+	global $_plugin_file;
+
+	// Load this plugin.
+	require_once $_plugin_file;
+	unset( $_plugin_file );
 }
+tests_add_filter( 'muplugins_loaded', '_phpunit_load_plugin_file' );
 
-require $test_root . '/includes/functions.php';
-
-function _manually_load_plugin() {
-	require WP_API_ROOT . '/plugin.php';
-	require dirname( __FILE__ ) . '/../plugin.php';
-}
-tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
-
-require $test_root . '/includes/bootstrap.php';
-
-// Helper classes
-if ( ! class_exists( 'WP_Test_REST_TestCase' ) ) {
-	require_once WP_API_ROOT . '/tests/class-wp-test-rest-testcase.php';
-}
-
-if ( ! class_exists( 'WP_Test_REST_Controller_TestCase' ) ) {
-	require_once WP_API_ROOT . '/tests/class-wp-test-rest-controller-testcase.php';
-}
-
-if ( ! class_exists( 'WP_Test_Spy_REST_Server' ) ) {
-	require_once WP_API_ROOT . '/tests/class-wp-test-spy-rest-server.php';
-}
-
-if ( ! class_exists( 'WP_REST_Test_Controller' ) ) {
-	require_once WP_API_ROOT . '/tests/class-wp-rest-test-controller.php';
-}
+require $_tests_dir . '/includes/bootstrap.php';
