@@ -128,7 +128,6 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_multisite_not_installed', __( 'Multisite is not installed' ), array( 'status' => 400 ) );
 		}
 
-
 		if ( ! current_user_can( 'manage_sites' ) ) {
 			if ( $this->check_my_read_permission( $request ) ) {
 				return true;
@@ -1043,7 +1042,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	 * @param WP_Site         $site    Site object.
 	 * @param WP_REST_Request $request Request data to check.
 	 *
-	 * @return bool Whether the site can be read.
+	 * @return bool|WP_Error Whether the site can be read.
 	 * @since x.x.x
 	 *
 	 */
@@ -1055,7 +1054,6 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 		if ( ! is_multisite() ) {
 			return new WP_Error( 'rest_multisite_not_installed', __( 'Multisite is not installed' ), array( 'status' => 400 ) );
 		}
-
 
 		if ( ! current_user_can( 'manage_sites' ) ) {
 			if ( $this->check_my_read_permission( $request ) ) {
@@ -1073,7 +1071,7 @@ class WP_REST_Sites_Controller extends WP_REST_Controller {
 	 *
 	 * @param object $site Site object.
 	 *
-	 * @return bool Whether the site can be edited or deleted.
+	 * @return bool|WP_Error Whether the site can be edited or deleted.
 	 * @since x.x.x
 	 *
 	 */
